@@ -1,0 +1,11 @@
+baseURL = "http://blog.eazy-dev.com/"
+languageCode = "ru"
+title = "EazyDev"
+theme = "etch"
+disableKinds = ["RSS", "taxonomy", "taxonomyTerm", "categories"]
+
+[permalinks]
+  posts = "/:year/:month/:filename/"
+
+[params]
+  description = "Блог о разработке на php, go, nodejs и прочем бэкенде. Иногда немного фронта и безопасности."
