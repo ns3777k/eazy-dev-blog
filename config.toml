@@ -1,5 +1,5 @@
 baseURL = "http://blog.eazy-dev.com/"
-languageCode = "ru"
+languageCode = "ru-RU"
 title = "EazyDev"
 theme = "etch"
 disableKinds = ["RSS", "taxonomy", "taxonomyTerm", "categories"]
