@@ -58,12 +58,12 @@ header#banner nav ul li a {
     color: #454545;
 }
 
-main#content a {
+main#content a, #footer a {
     color: #007dfa;
     text-decoration: none;
 }
 
-main#content a:hover {
+main#content a:hover, #footer a:hover {
     text-decoration: underline;
 }
 
@@ -222,5 +222,7 @@ footer#footer {
     font-size: 1.4rem;
     font-weight: 300;
     color: #949494;
-    margin: 40px 0;
+    margin: 20px 0;
+    border-top: 1px solid #949494;
+    padding-top: 10px;
 }
