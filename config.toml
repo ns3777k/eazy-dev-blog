@@ -1,4 +1,4 @@
-baseURL = "http://blog.eazy-dev.com/"
+baseURL = "https://blog.eazy-dev.com/"
 languageCode = "ru-RU"
 title = "EazyDev"
 theme = "etch"
