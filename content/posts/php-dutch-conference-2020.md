@@ -1,7 +1,7 @@
 +++
 title = "Конференция PHP Dutch 2020"
 date = "2020-06-23T01:33:40+03:00"
-tags = ["php", "conference"]
+tags = ["php", "conference", "backend"]
 +++
 
 26го июня пройдет бесплатная онлайн конференция `PHP Dutch 2020`. Программа:
