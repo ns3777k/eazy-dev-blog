@@ -1,0 +1,32 @@
+on:
+  push:
+    branches:
+      - master
+
+name: publish
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: '0.72.0'
+      - name: Build
+        run: hugo
+      - name: Deploying
+        shell: bash
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          mkdir -p $HOME/.ssh
+          echo "$SSH_KEY" > $HOME/.ssh/id_rsa
+          rsync -avz --delete public/ $SSH_USER@$SSH_HOST:$DEPLOY_PATH
