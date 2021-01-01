@@ -375,3 +375,5 @@ class HelloController
 ```
 
 Вы должны будете увидеть ответ, если дерните [http://localhost:8080/status](http://localhost:8080/status).
+
+Напоминалка. Весь написанный код будет расположен в [репозитории](https://github.com/ns3777k/symfony-api-demo).
