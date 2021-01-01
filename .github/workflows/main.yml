@@ -26,7 +26,9 @@ jobs:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
         run: |
           mkdir -p $HOME/.ssh
+          echo "$KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
           echo "$SSH_KEY" > $HOME/.ssh/id_rsa
           rsync -avz --delete public/ $SSH_USER@$SSH_HOST:$DEPLOY_PATH
