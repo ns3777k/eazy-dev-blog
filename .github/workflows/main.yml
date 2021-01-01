@@ -31,4 +31,5 @@ jobs:
           mkdir -p $HOME/.ssh
           echo "$KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
           echo "$SSH_KEY" > $HOME/.ssh/id_rsa
+          chmod 700 -R $HOME/.ssh
           rsync -avz --delete public/ $SSH_USER@$SSH_HOST:$DEPLOY_PATH
