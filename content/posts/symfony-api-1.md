@@ -1,7 +1,7 @@
 +++
 title = "Создание API на базе Symfony 5. Часть 1. Введение"
 date = "2020-12-31T15:30:20+03:00"
-tags = ["php", "backend", "symfony", "api"]
+tags = ["php", "backend", "symfony", "api", "tutorial"]
 +++
 
 [Создание API на базе Symfony 5. Часть 2. Подготовка окружения]({{< relref "symfony-api-2" >}})
