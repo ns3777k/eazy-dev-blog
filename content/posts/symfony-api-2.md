@@ -6,6 +6,8 @@ tags = ["php", "backend", "symfony", "api"]
 
 [Создание API на базе Symfony 5. Часть 1. Введение]({{< relref "symfony-api-1" >}})
 
+[Создание API на базе Symfony 5. Часть 3. Начало проекта]({{< relref "symfony-api-3" >}})
+
 ## Начинаем с мелочей
 
 Перед тем как начать что-то разрабатывать, нужно подготовить окружение. В этой части мы установим начальные зависимости,
@@ -318,7 +320,6 @@ includes:
 ```make
 .PHONY: lint
 lint:
-	composer validate --strict
 	bin/console lint:container
 	bin/console lint:yaml config/services.yaml --parse-tags
 	vendor/bin/php-cs-fixer fix -v --dry-run --stop-on-violation
@@ -345,6 +346,82 @@ RUN pecl install xdebug-2.8.1 && \
 ```shell
 $ make dev-composer-require PACKAGE="sensio/framework-extra-bundle symfony/monolog-bundle"
 ```
+
+## Настройка базы данных
+
+Мы будем использовать **postgres**. Сначала нужно поправить **Makefile**, изменив `dev-install` так, чтобы при первом
+вызове создавалась папка для сохранения данных базы. Вынесем это действие в новый таргет `dev-prepare-fs`:
+
+```make
+.PHONY: dev-prepare-fs
+dev-prepare-fs:
+    mkdir -p $(PWD)/docker/data/postgres/data || true
+
+.PHONY: dev-install
+dev-install: dev-prepare-fs dev-prepare-runtime
+    # ...
+```
+
+Перед запуском, нужно создать файл `docker/data/.gitignore` с содержимым `*`. Затем можно запускать команду:
+
+```shell
+$ make dev-prepare-fs
+```
+
+В `docker-compose.dev.yml` нужно добавить новый сервис:
+
+```yaml
+postgres:
+  image: postgres:13.1-alpine
+  user: "$DOCKERUSER"
+  volumes:
+      - "$PWD/docker/runtime/passwd:/etc/passwd:ro"
+      - "$PWD/docker/runtime/group:/etc/group:ro"
+      - "$PWD/docker/data/postgres/data:/var/lib/postgresql/data"
+  environment:
+      POSTGRES_DB: symfony-api-demo
+      POSTGRES_PASSWORD: password
+```
+
+Просто добавить сервис недостаточно, нужно удостовериться, что **php-fpm** запускается строго после поднятия базы данных,
+в противном случае, приложение будет падать если к нему обратится клиент в тот момент, когда база еще не поднялась, а
+поднимается она достаточно времени. Даже если мы не будем обращаться к серверу, то автоматический накат миграций при
+старте не будет проходить. Также, недостаточно прописать `depends_on` в определении сервиса **fpm**, потому что этот
+параметр не влияет на ожидание открытия порта.
+
+Чтобы восстановить правильный порядок запуска, необходимо добавить в образ скрипт [wait-for-it.sh](https://github.com/vishnubob/wait-for-it)
+и `command` в определение сервиса **fpm**:
+
+```yaml
+command: /wait-for-it.sh postgres:5432 -t 300 -- php-fpm -F -O
+```
+
+Пока с софтом закончили, приступим к подключению **ORM** к проекту:
+
+```shell
+$ make dev-composer-require PACKAGE="symfony/orm-pack"
+$ make dev-composer-require-dev PACKAGE="symfony/maker-bundle"
+```
+
+DSN подключения пропишем в `.env.local`:
+
+```cfg
+DATABASE_URL="postgresql://postgres:password@postgres:5432/symfony-api-demo?serverVersion=13&charset=utf8"
+```
+
+В `Dockerfile.dev` нужно добавить установку пакета `libpq-dev`, конфигурацию модуля `pgsql` и установку модулей
+`pdo_pgsql` и `pgsql`:
+
+```dockerfile
+RUN apt-get update -y && \
+    apt-get install -y libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql && \
+    docker-php-ext-install -j$(getconf _NPROCESSORS_ONLN) pdo_pgsql pgsql
+```
+
+После этого нужно пересобрать образ и можно запустить приложение.
 
 ## Финальная проверка и резюме
 
